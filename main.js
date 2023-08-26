@@ -4,7 +4,7 @@ let userWord = [];
 let wordOfTheDay;
 let paintedLetters = 0;
 let letterCount = {};
-
+let isLoading = false;
 const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'];
 
 const loadingDiv = document.querySelector(".loading");
@@ -63,7 +63,7 @@ function isLetter(value) {
   return /^[a-zA-Z]$/.test(value);
 }
 
-document.addEventListener("keydown", function (event) {
+document.addEventListener("keydown", function (event){
   let squareElement = document.querySelector(`.square-${column}-${row}`);
 
   if (isLetter(event.key) === true && userWord.length < 5) {
@@ -81,14 +81,19 @@ document.addEventListener("keydown", function (event) {
   }
 
   if (event.key === "Enter" && userWord.length === 5) {
-    verifyIfWordExists();
+    if(isLoading===true){
+      return;
+    } else {
+      verifyIfWordExists();
     return;
   }
-
-  if (!isLetter(event.key) || userWord.length < 5) return;
+  }
+ /* if (!isLetter(event.key) || userWord.length < 5) return;
+});*/
 });
 
 function verifyIfWordExists() {
+  isLoading=true;
   loadingDiv.style.display = "block";
   const validatorURL = "https://words.dev-apis.com/validate-word";
   fetch(validatorURL, {
@@ -115,19 +120,19 @@ function verifyIfWordExists() {
         }
       }
     });
+    isLoading = false;
 }
 
 function verifyWord() {
   paintedLetters = 0;
   letterCount = countLetters();
-  console.log(letterCount);
   const word = userWord.join("").toLowerCase();
   if (word === wordOfTheDay) {
-    win();
     for (let i = 1; i < 6; i++) {
       let squareElement = document.querySelector(`.square-${column}-${i}`);
       squareElement.style.backgroundColor = "green";
     }
+    win();
     return;
   } else {
     for (let j = 0; j < 5; j++) {
@@ -180,6 +185,7 @@ const count = 200,
   };
 
 function fire(particleRatio, opts) {
+  console.log("fire");
   confetti(
     Object.assign({}, defaults, opts, {
       particleCount: Math.floor(count * particleRatio),
@@ -187,35 +193,33 @@ function fire(particleRatio, opts) {
   );
 }
 
-fire(0.25, {
-  spread: 26,
-  startVelocity: 55,
-});
-
-fire(0.2, {
-  spread: 60,
-});
-
-fire(0.35, {
-  spread: 100,
-  decay: 0.91,
-  scalar: 0.8,
-});
-
-fire(0.1, {
-  spread: 120,
-  startVelocity: 25,
-  decay: 0.92,
-  scalar: 1.2,
-});
-
-fire(0.1, {
-  spread: 120,
-  startVelocity: 45,
-});
-
 function win(){
-fire(3,20);
+  fire(0.25, {
+    spread: 26,
+    startVelocity: 55,
+  });
+  
+  fire(0.2, {
+    spread: 60,
+  });
+  
+  fire(0.35, {
+    spread: 100,
+    decay: 0.91,
+    scalar: 0.8,
+  });
+  
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 25,
+    decay: 0.92,
+    scalar: 1.2,
+  });
+  
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 45,
+  });
 }
 
 function clear() {
