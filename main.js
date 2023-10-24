@@ -4,6 +4,9 @@ let userWord = [];
 let wordOfTheDay;
 let paintedLetters = 0;
 let letterCount = {};
+let isLoading = false;
+const colors = ["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6"];
+
 let alreadyRunning = false;
 const loadingDiv = document.querySelector(".loading");
 const help = document.querySelector(".help-image");
@@ -86,11 +89,10 @@ document.addEventListener("keydown", function (event) {
       return;
     }
   }
-
-  if (!isLetter(event.key) || userWord.length < 5) return;
 });
 
 function verifyIfWordExists() {
+  isLoading = true;
   loadingDiv.style.display = "block";
   const validatorURL = "https://words.dev-apis.com/validate-word";
   fetch(validatorURL, {
@@ -117,6 +119,7 @@ function verifyIfWordExists() {
         }
       }
     });
+  isLoading = false;
 }
 
 function verifyWord() {
@@ -124,11 +127,11 @@ function verifyWord() {
   letterCount = countLetters();
   const word = userWord.join("").toLowerCase();
   if (word === wordOfTheDay) {
-    alert("You win!");
     for (let i = 1; i < 6; i++) {
       let squareElement = document.querySelector(`.square-${column}-${i}`);
       squareElement.style.backgroundColor = "green";
     }
+    win();
     return;
   } else {
     for (let j = 0; j < 5; j++) {
@@ -170,6 +173,50 @@ function gameIsOver() {
   if (column === 7) {
     alert("Game Over! Try again tomorrow!");
   }
+}
+
+//fireworks
+const count = 200,
+  defaults = {
+    origin: { y: 0.7 },
+  };
+
+function fire(particleRatio, opts) {
+  console.log("fire");
+  confetti(
+    Object.assign({}, defaults, opts, {
+      particleCount: Math.floor(count * particleRatio),
+    })
+  );
+}
+
+function win() {
+  fire(0.25, {
+    spread: 26,
+    startVelocity: 55,
+  });
+
+  fire(0.2, {
+    spread: 60,
+  });
+
+  fire(0.35, {
+    spread: 100,
+    decay: 0.91,
+    scalar: 0.8,
+  });
+
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 25,
+    decay: 0.92,
+    scalar: 1.2,
+  });
+
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 45,
+  });
 }
 
 function clear() {
