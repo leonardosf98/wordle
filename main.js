@@ -4,6 +4,7 @@ let userWord = [];
 let wordOfTheDay;
 let paintedLetters = 0;
 let letterCount = {};
+let alreadyRunning = false;
 const loadingDiv = document.querySelector(".loading");
 const help = document.querySelector(".help-image");
 const dialogHelp = document.querySelector(".help-dialog");
@@ -55,7 +56,6 @@ function countLetters() {
   return formattedLetterCount;
 }
 
-
 function isLetter(value) {
   return /^[a-zA-Z]$/.test(value);
 }
@@ -78,8 +78,13 @@ document.addEventListener("keydown", function (event) {
   }
 
   if (event.key === "Enter" && userWord.length === 5) {
-    verifyIfWordExists();
-    return;
+    if (alreadyRunning) {
+      event.preventDefault();
+    } else {
+      alreadyRunning = true;
+      verifyIfWordExists();
+      return;
+    }
   }
 
   if (!isLetter(event.key) || userWord.length < 5) return;
@@ -117,7 +122,6 @@ function verifyIfWordExists() {
 function verifyWord() {
   paintedLetters = 0;
   letterCount = countLetters();
-  console.log(letterCount);
   const word = userWord.join("").toLowerCase();
   if (word === wordOfTheDay) {
     alert("You win!");
@@ -128,28 +132,25 @@ function verifyWord() {
     return;
   } else {
     for (let j = 0; j < 5; j++) {
-      if (word[j] === wordOfTheDay[j]) {
+      let letter = word[j];
+      if (word[j] === wordOfTheDay[j] && letterCount[`${letter}`] !== 0) {
         let squareElement = document.querySelector(
           `.square-${column}-${j + 1}`
         );
+        letterCount[`${letter}`]--;
+        console.log(letterCount[`${letter}`]);
+        debugger;
         squareElement.style.backgroundColor = "green";
-      } else if (wordOfTheDay.includes(word[j])) {
+      } else if (
+        wordOfTheDay.includes(word[j]) &&
+        letterCount[`${letter}`] !== 0
+      ) {
+        letterCount[`${letter}`]--;
         let squareElement = document.querySelector(
           `.square-${column}-${j + 1}`
-        );/* Em desenvolvimento para consertar erro onde letra fica amarela sem precisar
-        for (m = 0; m < wordOfTheDay.length; m++) {
-         if(word[j] === wordOfTheDay[m]){
-          squareElement.style.backgroundColor = "red";
-      } else if (letterCount[word[j]] === 0){
-        squareElement.style.backgroundColor = "red";
-      } else {
-        letterCount[word[j]] -= 1;
+        );
         squareElement.style.backgroundColor = "yellow";
-      }
-     }
-     } */
-     squareElement.style.backgroundColor = "yellow";
-    } else {
+      } else {
         let squareElement = document.querySelector(
           `.square-${column}-${j + 1}`
         );
@@ -161,6 +162,7 @@ function verifyWord() {
   userWord = [];
   row = 1;
   gameIsOver();
+  alreadyRunning = false;
 }
 
 createBoard();
