@@ -120,6 +120,7 @@ function verifyIfWordExists() {
       }
     });
   isLoading = false;
+  alreadyRunning = false;
 }
 
 function verifyWord() {
@@ -142,7 +143,6 @@ function verifyWord() {
         );
         letterCount[`${letter}`]--;
         console.log(letterCount[`${letter}`]);
-        debugger;
         squareElement.style.backgroundColor = "green";
       } else if (
         wordOfTheDay.includes(word[j]) &&
