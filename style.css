@@ -122,7 +122,9 @@
   pointer-events: none;
   z-index: 1;
 }
-
+#user-word {
+  display: none;
+}
 @media (max-width: 32em) {
   .page {
     width: 100vw;

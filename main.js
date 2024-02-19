@@ -13,6 +13,7 @@ const help = document.querySelector(".help-image");
 const dialogHelp = document.querySelector(".help-dialog");
 const closeDialog = document.querySelector(".close-dialog");
 const wordURL = "https://words.dev-apis.com/word-of-the-day";
+const userWordInput = document.querySelector("#user-word");
 
 function getWordOfTheDay() {
   const promise = fetch(wordURL);
@@ -25,6 +26,7 @@ function getWordOfTheDay() {
       wordOfTheDay = processedResponse.word;
     });
   loadingDiv.style.display = "none";
+  userWordInput.focus();
 }
 
 getWordOfTheDay();
@@ -73,6 +75,9 @@ document.addEventListener("keydown", function (event) {
   }
 
   if (event.key === "Backspace") {
+    if (userWord.length === 0) {
+      return;
+    }
     userWord.pop();
     let element = document.querySelector(`.square-${column}-${row - 1}`);
     element.innerHTML = "";
@@ -89,6 +94,7 @@ document.addEventListener("keydown", function (event) {
       return;
     }
   }
+  console.log(userWordInput.value);
 });
 
 function verifyIfWordExists() {
@@ -142,7 +148,6 @@ function verifyWord() {
           `.square-${column}-${j + 1}`
         );
         letterCount[`${letter}`]--;
-        console.log(letterCount[`${letter}`]);
         squareElement.style.backgroundColor = "green";
       } else if (
         wordOfTheDay.includes(word[j]) &&
@@ -182,7 +187,6 @@ const count = 200,
   };
 
 function fire(particleRatio, opts) {
-  console.log("fire");
   confetti(
     Object.assign({}, defaults, opts, {
       particleCount: Math.floor(count * particleRatio),
