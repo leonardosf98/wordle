@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap");
 
 * {
   margin: 0;
@@ -6,9 +6,11 @@
   box-sizing: border-box;
 }
 .page {
-  font-family: 'Roboto Condensed', sans-serif;
+  font-family: "Roboto Condensed", sans-serif;
   width: 100vw;
   height: 100vh;
+  max-height: calc(100vh - 2rem);
+  min-height: 100vh;
   background-color: rgb(131, 131, 131);
 }
 
@@ -24,6 +26,7 @@
   user-select: none;
 }
 .square__container {
+  max-height: calc(100vh - 2rem);
   width: 30rem;
   display: grid;
   grid-template-columns: repeat(5, 1fr);

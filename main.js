@@ -5,15 +5,15 @@ let wordOfTheDay;
 let paintedLetters = 0;
 let letterCount = {};
 let isLoading = false;
-const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'];
+const colors = ["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6"];
 
 let alreadyRunning = false;
-const loadingDiv = document.querySelector('.loading');
-const help = document.querySelector('.help-image');
-const dialogHelp = document.querySelector('.help-dialog');
-const closeDialog = document.querySelector('.close-dialog');
-const wordURL = 'https://words.dev-apis.com/word-of-the-day';
-const userWordInput = document.querySelector('#user-word');
+const loadingDiv = document.querySelector(".loading");
+const help = document.querySelector(".help-image");
+const dialogHelp = document.querySelector(".help-dialog");
+const closeDialog = document.querySelector(".close-dialog");
+const wordURL = "https://words.dev-apis.com/word-of-the-day";
+const userWordInput = document.querySelector("#user-word");
 
 function getWordOfTheDay() {
   const promise = fetch(wordURL);
@@ -25,22 +25,23 @@ function getWordOfTheDay() {
     .then(function (processedResponse) {
       wordOfTheDay = processedResponse.word;
     });
-  loadingDiv.style.display = 'none';
+  loadingDiv.style.display = "none";
 }
 
 getWordOfTheDay();
 
 function createBoard() {
-  let row = document.querySelector('.square__container');
+  let row = document.querySelector(".square__container");
   for (let linhas = 1; linhas < 7; linhas++) {
     for (let colunas = 1; colunas < 6; colunas++) {
-      let square = document.createElement('div');
+      let square = document.createElement("div");
       square.classList.add(`square`);
       square.classList.add(`square-${linhas}-${colunas}`);
       row.appendChild(square);
-      document.querySelector('main').appendChild(row);
+      document.querySelector("main").appendChild(row);
     }
   }
+  drawBorder(1);
 }
 
 function countLetters() {
@@ -59,18 +60,23 @@ function countLetters() {
   }
   return formattedLetterCount;
 }
-/*function drawBorder(number) {
-  for (i = 1; i < 6; i++) {
-    let squareElement = document.querySelector(`.square-${i}-${number}`);
-    squareElement.style.border = '1px solid black';
-  }
-}
-drawBorder(1);*/
 function isLetter(value) {
   return /^[a-zA-Z]$/.test(value);
 }
+function drawBorder(number) {
+  for (i = 1; i < 6; i++) {
+    const squareElement = document.querySelector(`.square-${number}-${i}`);
+    squareElement.style.border = "3px solid black";
+  }
+}
+function removeBorder(number) {
+  for (i = 1; i < 6; i++) {
+    const squareElement = document.querySelector(`.square-${number - 1}-${i}`);
+    squareElement.style.border = "0px";
+  }
+}
 
-document.addEventListener('keydown', function (event) {
+document.addEventListener("keydown", function (event) {
   let squareElement = document.querySelector(`.square-${column}-${row}`);
 
   if (isLetter(event.key) === true && userWord.length < 5) {
@@ -79,18 +85,18 @@ document.addEventListener('keydown', function (event) {
     row++;
   }
 
-  if (event.key === 'Backspace') {
+  if (event.key === "Backspace") {
     if (userWord.length === 0) {
       return;
     }
     userWord.pop();
     let element = document.querySelector(`.square-${column}-${row - 1}`);
-    element.innerHTML = '';
+    element.innerHTML = "";
     if (column > 0) row--;
     return;
   }
 
-  if (event.key === 'Enter' && userWord.length === 5) {
+  if (event.key === "Enter" && userWord.length === 5) {
     if (alreadyRunning) {
       event.preventDefault();
     } else {
@@ -103,27 +109,27 @@ document.addEventListener('keydown', function (event) {
 
 function verifyIfWordExists() {
   isLoading = true;
-  loadingDiv.style.display = 'block';
-  const validatorURL = 'https://words.dev-apis.com/validate-word';
+  loadingDiv.style.display = "block";
+  const validatorURL = "https://words.dev-apis.com/validate-word";
   fetch(validatorURL, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify({
-      word: userWord.join('').toLowerCase(),
+      word: userWord.join("").toLowerCase(),
     }),
   })
     .then(function (response) {
       return response.json();
     })
     .then(function (data) {
-      loadingDiv.style.display = 'none';
+      loadingDiv.style.display = "none";
       if (data.validWord === true) {
         verifyWord();
       } else {
         for (let i = 1; i < 6; i++) {
           let squareElement = document.querySelector(`.square-${column}-${i}`);
-          squareElement.style.backgroundColor = 'red';
+          squareElement.style.backgroundColor = "red";
           setTimeout(function () {
-            squareElement.style.backgroundColor = 'white';
+            squareElement.style.backgroundColor = "white";
           }, 100);
           clear();
         }
@@ -136,11 +142,11 @@ function verifyIfWordExists() {
 function verifyWord() {
   paintedLetters = 0;
   letterCount = countLetters();
-  const word = userWord.join('').toLowerCase();
+  const word = userWord.join("").toLowerCase();
   if (word === wordOfTheDay) {
     for (let i = 1; i < 6; i++) {
       let squareElement = document.querySelector(`.square-${column}-${i}`);
-      squareElement.style.backgroundColor = 'green';
+      squareElement.style.backgroundColor = "green";
     }
     win();
     return;
@@ -152,7 +158,7 @@ function verifyWord() {
           `.square-${column}-${j + 1}`
         );
         letterCount[`${letter}`]--;
-        squareElement.style.backgroundColor = 'green';
+        squareElement.style.backgroundColor = "green";
       } else if (
         wordOfTheDay.includes(word[j]) &&
         letterCount[`${letter}`] !== 0
@@ -161,17 +167,18 @@ function verifyWord() {
         let squareElement = document.querySelector(
           `.square-${column}-${j + 1}`
         );
-        squareElement.style.backgroundColor = 'yellow';
+        squareElement.style.backgroundColor = "yellow";
       } else {
         let squareElement = document.querySelector(
           `.square-${column}-${j + 1}`
         );
-        squareElement.style.backgroundColor = 'red';
+        squareElement.style.backgroundColor = "red";
       }
     }
   }
   column++;
-  drawBorder(row);
+  removeBorder(column);
+  drawBorder(column);
   userWord = [];
   row = 1;
   gameIsOver();
@@ -181,7 +188,7 @@ function verifyWord() {
 createBoard();
 function gameIsOver() {
   if (column === 7) {
-    alert('Game Over! Try again tomorrow!');
+    alert("Game Over! Try again tomorrow!");
   }
 }
 
@@ -233,12 +240,12 @@ function clear() {
   row = 1;
   for (let i = 1; i < 6; i++) {
     let squareElement = document.querySelector(`.square-${column}-${i}`);
-    squareElement.innerHTML = '';
+    squareElement.innerHTML = "";
   }
 }
 
-help.addEventListener('click', showHelp);
-closeDialog.addEventListener('click', closeHelp);
+help.addEventListener("click", showHelp);
+closeDialog.addEventListener("click", closeHelp);
 
 function showHelp() {
   dialogHelp.showModal();
