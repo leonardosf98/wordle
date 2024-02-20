@@ -1,44 +1,49 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wordle!</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<body class="page">
+  <body class="page">
     <header class="title__container">
-                   <h1 class="title">WORDLE</h1>
+      <h1 class="title">WORDLE</h1>
     </header>
     <main>
-        <input type="text" id="user-word"></input>
-        <dialog class="help-dialog">
-            <button class="close-dialog">OK</button>
-            <p>
-                O objetivo desse jogo é descobrir a palavra certa, você tem 6 tentativas para isso!</p><br>
-            <p>Atualmente, este jogo só funciona com palavras em inglês. Caso você digite uma palavra que não é
-                válida,
-                a palavra sumirá. </p><br>
-            <p> Se o quadrado ficar verde, a letra está correta no lugar correto, caso apareça amarelo, a letra tem
-                na
-                palavra mas está no lugar errado,
-                e caso seja vermelho, não existe a letra na palavra.</p><br>
-            </p>
-            </div>
-        </dialog>
-        <section class="content-container">
-            <div class="loading"></div>
-            <div class="square__container"></div>
-            <img class="help-image" src="assets/help.png" alt="ícone de ajuda para o tutorial">
-        </section>
+      <dialog class="help-dialog">
+        <button class="close-dialog">OK</button>
+        <p>
+          O objetivo desse jogo é descobrir a palavra certa, você tem 6
+          tentativas para isso!
+        </p>
+        <br />
+        <p>
+          Atualmente, este jogo só funciona com palavras em inglês. Caso você
+          digite uma palavra que não é válida, a palavra sumirá.
+        </p>
+        <br />
+        <p>
+          Se o quadrado ficar verde, a letra está correta no lugar correto, caso
+          apareça amarelo, a letra tem na palavra mas está no lugar errado, e
+          caso seja vermelho, não existe a letra na palavra.
+        </p>
+      </dialog>
+
+      <section class="content-container">
+        <div class="loading"></div>
+        <div class="square__container"></div>
+        <img
+          class="help-image"
+          src="assets/help.png"
+          alt="ícone de ajuda para o tutorial"
+        />
+      </section>
     </main>
+  </body>
 
-</body>
-
-<script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@2.12.0/tsparticles.confetti.bundle.min.js"></script>
-<script src="main.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@2.12.0/tsparticles.confetti.bundle.min.js"></script>
+  <script src="main.js"></script>
 </html>
