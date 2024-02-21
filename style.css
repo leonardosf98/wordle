@@ -137,10 +137,16 @@ main {
   .page {
     width: 100vw;
   }
-
+  .square {
+    width: 3rem;
+    height: 3rem;
+    font-size: 2rem;
+  }
   .square__container {
+    width: 80%;
     align-items: center;
     justify-content: center;
+    grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr));
     margin: 0 auto;
     height: 75vh;
   }
