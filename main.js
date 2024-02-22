@@ -4,10 +4,9 @@ let userWord = [];
 let wordOfTheDay;
 let paintedLetters = 0;
 let letterCount = {};
-let isLoading = false;
+let alreadyRunning = false;
 const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'];
 
-let alreadyRunning = false;
 const loadingDiv = document.querySelector('.loading');
 const help = document.querySelector('.help-image');
 const dialogHelp = document.querySelector('.help-dialog');
@@ -99,19 +98,18 @@ document.addEventListener('keydown', function (event) {
     return;
   }
 
-  if (event.key === 'Enter' && userWord.length === 5) {
-    if (alreadyRunning) {
-      event.preventDefault();
-    } else {
-      alreadyRunning = true;
-      verifyIfWordExists();
-      return;
-    }
+  if (
+    event.key === 'Enter' &&
+    userWord.length === 5 &&
+    alreadyRunning === false
+  ) {
+    alreadyRunning = true;
+    verifyIfWordExists();
+    return;
   }
 });
 
 function verifyIfWordExists() {
-  isLoading = true;
   loadingDiv.style.display = 'block';
   const validatorURL = 'https://words.dev-apis.com/validate-word';
   fetch(validatorURL, {
@@ -135,11 +133,10 @@ function verifyIfWordExists() {
             squareElement.style.backgroundColor = 'white';
           }, 100);
           clear();
+          alreadyRunning = false;
         }
       }
     });
-  isLoading = false;
-  alreadyRunning = false;
 }
 
 function verifyWord() {
