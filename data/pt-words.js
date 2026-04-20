@@ -1,4 +1,4 @@
-/* Gerado a partir de data/pt-words.json — não editar à mão; regenere com o script do repositório. */
+/* Única fonte das palavras PT no jogo (carregada antes de main.js). Edite solutions/guesses neste objeto. */
 window.__PT_WORDS__ = {
   "solutions": [
     "amigo",

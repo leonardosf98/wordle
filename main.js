@@ -12,7 +12,6 @@ const dialogHelp = document.querySelector('.help-dialog');
 const closeDialog = document.querySelector('.close-dialog');
 const wordURL = 'https://words.dev-apis.com/word-of-the-day';
 const validatorURL = 'https://words.dev-apis.com/validate-word';
-const ptWordsURL = 'data/pt-words.json';
 const mobileKbInput = document.getElementById('mobile-keyboard-capture');
 const toastEl = document.getElementById('toast');
 const LANG_STORAGE_KEY = 'wordle-lang';
@@ -174,21 +173,7 @@ function loadPtWordBank() {
       return Promise.reject(e);
     }
   }
-  ptWordsLoadPromise = fetch(ptWordsURL)
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error('Falha ao carregar palavras em português');
-      }
-      return response.json();
-    })
-    .then(function (data) {
-      applyPtWordData(data);
-      return true;
-    })
-    .catch(function (err) {
-      ptWordsLoadPromise = null;
-      throw err;
-    });
+  ptWordsLoadPromise = Promise.reject(new Error('Dicionário PT ausente: inclua data/pt-words.js antes de main.js'));
   return ptWordsLoadPromise;
 }
 
