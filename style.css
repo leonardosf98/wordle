@@ -56,6 +56,12 @@ main {
   align-items: center;
   justify-content: center;
   font-size: 40px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.square--focused {
+  box-shadow: inset 0 0 0 3px #3498db;
 }
 .content-container {
   margin-top: 20px;

@@ -1,6 +1,6 @@
-let row = 1;
+let activeSlot = 1;
 let column = 1;
-let userWord = [];
+const guessLetters = ['', '', '', '', ''];
 let wordOfTheDay;
 let paintedLetters = 0;
 let alreadyRunning = false;
@@ -29,17 +29,55 @@ function getWordOfTheDay() {
 getWordOfTheDay();
 
 function createBoard() {
-  let row = document.querySelector('.square__container');
+  const container = document.querySelector('.square__container');
   for (let linhas = 1; linhas < 7; linhas++) {
     for (let colunas = 1; colunas < 6; colunas++) {
-      let square = document.createElement('div');
-      square.classList.add(`square`);
+      const square = document.createElement('div');
+      square.classList.add('square');
       square.classList.add(`square-${linhas}-${colunas}`);
-      row.appendChild(square);
-      document.querySelector('main').appendChild(row);
+      square.dataset.line = String(linhas);
+      square.dataset.col = String(colunas);
+      container.appendChild(square);
     }
   }
   drawBorder(1);
+  syncGuessToDOM();
+}
+
+function getGuessWord() {
+  return guessLetters.join('').toLowerCase();
+}
+
+function isGuessComplete() {
+  return guessLetters.every(function (ch) {
+    return ch.length === 1;
+  });
+}
+
+function syncGuessToDOM() {
+  if (column < 7) {
+    for (let j = 1; j <= 5; j++) {
+      const el = document.querySelector(`.square-${column}-${j}`);
+      const ch = guessLetters[j - 1];
+      el.innerText = ch ? ch.toUpperCase() : '';
+    }
+  }
+  setFocusedSquare();
+}
+
+function clearSlotFocus() {
+  for (let linhas = 1; linhas < 7; linhas++) {
+    for (let j = 1; j <= 5; j++) {
+      document.querySelector(`.square-${linhas}-${j}`).classList.remove('square--focused');
+    }
+  }
+}
+
+function setFocusedSquare() {
+  clearSlotFocus();
+  if (column < 7) {
+    document.querySelector(`.square-${column}-${activeSlot}`).classList.add('square--focused');
+  }
 }
 
 function countLettersInAnswer() {
@@ -70,34 +108,75 @@ function removeBorder(number) {
 }
 
 document.addEventListener('keydown', function (event) {
-  let squareElement = document.querySelector(`.square-${column}-${row}`);
-
-  if (isLetter(event.key) === true && userWord.length < 5) {
-    userWord.push(event.key);
-    squareElement.innerText = event.key.toUpperCase();
-    row++;
-  }
-
-  if (event.key === 'Backspace') {
-    if (userWord.length === 0) {
-      return;
-    }
-    userWord.pop();
-    let element = document.querySelector(`.square-${column}-${row - 1}`);
-    element.innerHTML = '';
-    if (column > 0) row--;
+  if (dialogHelp.open) {
     return;
   }
 
   if (
     event.key === 'Enter' &&
-    userWord.length === 5 &&
-    alreadyRunning === false
+    isGuessComplete() &&
+    alreadyRunning === false &&
+    column < 7
   ) {
     alreadyRunning = true;
     verifyIfWordExists();
     return;
   }
+
+  if (column >= 7 || alreadyRunning) {
+    return;
+  }
+
+  const tag = event.target && event.target.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || event.target.isContentEditable) {
+    return;
+  }
+
+  if (event.key === 'ArrowLeft' && activeSlot > 1) {
+    activeSlot--;
+    setFocusedSquare();
+    return;
+  }
+
+  if (event.key === 'ArrowRight' && activeSlot < 5) {
+    activeSlot++;
+    setFocusedSquare();
+    return;
+  }
+
+  if (event.key === 'Backspace') {
+    if (guessLetters[activeSlot - 1]) {
+      guessLetters[activeSlot - 1] = '';
+    } else if (activeSlot > 1) {
+      activeSlot--;
+      guessLetters[activeSlot - 1] = '';
+    }
+    syncGuessToDOM();
+    return;
+  }
+
+  if (isLetter(event.key)) {
+    guessLetters[activeSlot - 1] = event.key.toLowerCase();
+    syncGuessToDOM();
+    if (activeSlot < 5) {
+      activeSlot++;
+    }
+    setFocusedSquare();
+  }
+});
+
+document.querySelector('.square__container').addEventListener('click', function (e) {
+  const cell = e.target.closest('.square');
+  if (!cell || alreadyRunning || dialogHelp.open || column >= 7) {
+    return;
+  }
+  const line = Number(cell.dataset.line);
+  const col = Number(cell.dataset.col);
+  if (line !== column) {
+    return;
+  }
+  activeSlot = col;
+  setFocusedSquare();
 });
 
 function verifyIfWordExists() {
@@ -106,7 +185,7 @@ function verifyIfWordExists() {
   fetch(validatorURL, {
     method: 'POST',
     body: JSON.stringify({
-      word: userWord.join('').toLowerCase(),
+      word: getGuessWord(),
     }),
   })
     .then(function (response) {
@@ -132,12 +211,13 @@ function verifyIfWordExists() {
 
 function verifyWord() {
   paintedLetters = 0;
-  const word = userWord.join('').toLowerCase();
+  const word = getGuessWord();
   if (word === wordOfTheDay) {
     for (let i = 1; i < 6; i++) {
       let squareElement = document.querySelector(`.square-${column}-${i}`);
       squareElement.style.backgroundColor = 'green';
     }
+    clearSlotFocus();
     win();
     return;
   } else {
@@ -178,8 +258,11 @@ function verifyWord() {
   column++;
   removeBorder(column);
   drawBorder(column);
-  userWord = [];
-  row = 1;
+  for (let i = 0; i < 5; i++) {
+    guessLetters[i] = '';
+  }
+  activeSlot = 1;
+  syncGuessToDOM();
   gameIsOver();
   alreadyRunning = false;
 }
@@ -236,12 +319,11 @@ function win() {
 }
 
 function clear() {
-  userWord = [];
-  row = 1;
-  for (let i = 1; i < 6; i++) {
-    let squareElement = document.querySelector(`.square-${column}-${i}`);
-    squareElement.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    guessLetters[i] = '';
   }
+  activeSlot = 1;
+  syncGuessToDOM();
 }
 
 help.addEventListener('click', showHelp);
