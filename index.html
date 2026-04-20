@@ -10,6 +10,14 @@
 
   <body class="page">
     <header class="title__container">
+      <div class="lang-bar" role="group" aria-label="Idioma do jogo">
+        <button type="button" class="lang-toggle" data-lang="en" aria-pressed="false" aria-label="Jogar em inglês">
+          EN
+        </button>
+        <button type="button" class="lang-toggle" data-lang="pt" aria-pressed="false" aria-label="Jogar em português">
+          PT
+        </button>
+      </div>
       <h1 class="title">WORDLE</h1>
     </header>
     <main>
@@ -21,9 +29,14 @@
         </p>
         <br />
         <p>
-          Atualmente, este jogo só funciona com palavras em inglês. Caso você
-          digite uma palavra que não é válida, a tentativa some e aparece um
-          aviso na parte de baixo da tela.
+          Use os botões EN ou PT no topo para escolher o idioma. Em inglês, a
+          palavra do dia e a validação vêm da API pública do curso (palavras em
+          inglês). Em português, a palavra do dia vem de uma lista local
+          (arquivo incluído no jogo; sem acentos, cinco letras) e o fuso do dia
+          é o de São Paulo. Se o português não carregar, o jogo volta para o
+          inglês. Se o palpite
+          não for válido, a linha pisca em vermelho e aparece um aviso na parte
+          de baixo da tela.
         </p>
         <br />
         <p>
@@ -71,5 +84,6 @@
   </body>
 
   <script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@2.12.0/tsparticles.confetti.bundle.min.js"></script>
+  <script src="data/pt-words.js"></script>
   <script src="main.js"></script>
 </html>
