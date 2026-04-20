@@ -3,7 +3,6 @@ let column = 1;
 let userWord = [];
 let wordOfTheDay;
 let paintedLetters = 0;
-let letterCount = {};
 let alreadyRunning = false;
 const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'];
 
@@ -43,21 +42,13 @@ function createBoard() {
   drawBorder(1);
 }
 
-function countLetters() {
+function countLettersInAnswer() {
+  const counts = {};
   for (let i = 0; i < wordOfTheDay.length; i++) {
     const letter = wordOfTheDay[i];
-    if (letterCount[letter]) {
-      letterCount[letter]++;
-    } else {
-      letterCount[letter] = 1;
-    }
+    counts[letter] = (counts[letter] || 0) + 1;
   }
-  const formattedLetterCount = {};
-
-  for (const letter in letterCount) {
-    formattedLetterCount[letter] = letterCount[letter];
-  }
-  return formattedLetterCount;
+  return counts;
 }
 function isLetter(value) {
   return /^[a-zA-Z]$/.test(value);
@@ -141,7 +132,6 @@ function verifyIfWordExists() {
 
 function verifyWord() {
   paintedLetters = 0;
-  letterCount = countLetters();
   const word = userWord.join('').toLowerCase();
   if (word === wordOfTheDay) {
     for (let i = 1; i < 6; i++) {
@@ -151,27 +141,36 @@ function verifyWord() {
     win();
     return;
   } else {
+    const remaining = countLettersInAnswer();
+    const status = new Array(5).fill('absent');
+
     for (let j = 0; j < 5; j++) {
-      let letter = word[j];
-      if (word[j] === wordOfTheDay[j] && letterCount[`${letter}`] !== 0) {
-        let squareElement = document.querySelector(
-          `.square-${column}-${j + 1}`
-        );
-        letterCount[`${letter}`]--;
+      if (word[j] === wordOfTheDay[j]) {
+        status[j] = 'correct';
+        remaining[word[j]]--;
+      }
+    }
+
+    for (let j = 0; j < 5; j++) {
+      if (status[j] === 'correct') {
+        continue;
+      }
+      const letter = word[j];
+      if ((remaining[letter] || 0) > 0) {
+        status[j] = 'present';
+        remaining[letter]--;
+      }
+    }
+
+    for (let j = 0; j < 5; j++) {
+      const squareElement = document.querySelector(
+        `.square-${column}-${j + 1}`
+      );
+      if (status[j] === 'correct') {
         squareElement.style.backgroundColor = 'green';
-      } else if (
-        wordOfTheDay.includes(word[j]) &&
-        letterCount[`${letter}`] !== 0
-      ) {
-        letterCount[`${letter}`]--;
-        let squareElement = document.querySelector(
-          `.square-${column}-${j + 1}`
-        );
+      } else if (status[j] === 'present') {
         squareElement.style.backgroundColor = 'yellow';
       } else {
-        let squareElement = document.querySelector(
-          `.square-${column}-${j + 1}`
-        );
         squareElement.style.backgroundColor = 'red';
       }
     }
