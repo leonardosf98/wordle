@@ -22,7 +22,8 @@
         <br />
         <p>
           Atualmente, este jogo só funciona com palavras em inglês. Caso você
-          digite uma palavra que não é válida, a palavra sumirá.
+          digite uma palavra que não é válida, a tentativa some e aparece um
+          aviso na parte de baixo da tela.
         </p>
         <br />
         <p>
@@ -36,11 +37,29 @@
           primeiro e ir preenchendo em qualquer ordem. As setas esquerda e
           direita também mudam a caixa selecionada.
         </p>
+        <br />
+        <p>
+          No celular, toque na linha colorida do palpite para abrir o teclado e
+          digitar.
+        </p>
       </dialog>
 
       <section class="content-container">
         <div class="loading"></div>
         <div class="square__container"></div>
+        <input
+          id="mobile-keyboard-capture"
+          class="mobile-keyboard-capture"
+          type="text"
+          maxlength="5"
+          inputmode="text"
+          enterkeyhint="done"
+          autocapitalize="none"
+          autocomplete="off"
+          spellcheck="false"
+          tabindex="-1"
+          aria-hidden="true"
+        />
         <img
           class="help-image"
           src="assets/help.png"
@@ -48,6 +67,7 @@
         />
       </section>
     </main>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </body>
 
   <script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@2.12.0/tsparticles.confetti.bundle.min.js"></script>

@@ -35,8 +35,8 @@ main {
 .square__container {
   width: 100vw;
   height: 70vh;
-  max-width: 25em; /* Mantenha o máximo para evitar que o container se torne muito largo */
-  max-height: 30em; /* Mantenha o máximo para evitar que o container se torne muito alto */
+  max-width: 25em;
+  max-height: 30em;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(4rem, 1fr));
   align-items: center;
@@ -63,11 +63,52 @@ main {
 .square--focused {
   box-shadow: inset 0 0 0 3px #3498db;
 }
+.toast {
+  position: fixed;
+  bottom: 5.5rem;
+  left: 50%;
+  transform: translate(-50%, 12px);
+  opacity: 0;
+  pointer-events: none;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  z-index: 100;
+  max-width: min(22rem, calc(100vw - 2rem));
+  text-align: center;
+  line-height: 1.35;
+}
+
+.toast.toast--visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 .content-container {
   margin-top: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* Campo só para foco + teclado no celular; fora da tela, não altera o layout desktop */
+.mobile-keyboard-capture {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  border: 0;
+  font-size: 16px; /* evita zoom automático no iOS ao focar */
 }
 
 .loading {
@@ -136,31 +177,73 @@ main {
   pointer-events: none;
   z-index: 1;
 }
-#user-word {
-  display: none;
-}
+
+/* Ajustes só para telas estreitas (celular) */
 @media (max-width: 32em) {
-  .page {
-    width: 100vw;
+  html {
+    width: 100%;
+    min-height: 100dvh;
+    height: auto;
   }
-  .square {
-    width: 3rem;
-    height: 3rem;
-    font-size: 2rem;
+  .page {
+    width: 100%;
+    min-height: 100dvh;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+  .title__container {
+    padding-top: clamp(0.75rem, 3vw, 1.5rem);
+  }
+  .title {
+    font-size: clamp(1.85rem, 9vw, 2.75rem);
+  }
+  .content-container {
+    margin-top: 0.75rem;
+    padding-inline: 0.5rem;
   }
   .square__container {
-    width: 80%;
-    align-items: center;
-    justify-content: center;
-    grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr));
-    margin: 0 auto;
-    height: 75vh;
+    width: min(calc(100vw - 1rem), 22rem);
+    height: auto;
+    aspect-ratio: 5 / 6;
+    max-height: min(62dvh, 26rem);
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-rows: repeat(6, minmax(0, 1fr));
+    gap: clamp(4px, 1.8vw, 8px);
+    grid-column-gap: 0;
+    margin-inline: auto;
+    align-content: center;
+  }
+  .square {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    font-size: clamp(1.25rem, 8.5vmin, 2rem);
+    border-radius: clamp(6px, 1.5vw, 10px);
+    transition: background-color 0.35s ease, box-shadow 0.2s ease;
+  }
+  .help-image {
+    bottom: max(10px, env(safe-area-inset-bottom));
+    right: max(10px, env(safe-area-inset-right));
+    width: 48px;
+    height: 48px;
+    z-index: 2;
   }
   .help-dialog {
-    padding: 1em;
-    padding-top: 2em;
-    font-size: 1.25em;
-    height: 80%;
-    top: 10%;
+    width: min(calc(100vw - 1.5rem), 26rem);
+    max-height: min(88dvh, 34rem);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    padding: clamp(2.5rem, 6vw, 2.75rem) clamp(1rem, 4vw, 1.5rem) clamp(1rem, 3vw, 1.5rem);
+    font-size: clamp(0.95rem, 3.8vw, 1.2rem);
+    overflow: auto;
+    border-radius: 10px;
+    border: none;
+  }
+  .toast {
+    bottom: max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem));
   }
 }

@@ -11,7 +11,68 @@ const help = document.querySelector('.help-image');
 const dialogHelp = document.querySelector('.help-dialog');
 const closeDialog = document.querySelector('.close-dialog');
 const wordURL = 'https://words.dev-apis.com/word-of-the-day';
-const userWordInput = document.querySelector('#user-word');
+const mobileKbInput = document.getElementById('mobile-keyboard-capture');
+const toastEl = document.getElementById('toast');
+let toastHideTimer;
+let ignoreCaptureInputEvent = false;
+
+function prefersTouchKeyboard() {
+  return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+}
+
+function syncCaptureFromGuessState() {
+  if (!mobileKbInput) {
+    return;
+  }
+  ignoreCaptureInputEvent = true;
+  mobileKbInput.value = getGuessWord();
+  ignoreCaptureInputEvent = false;
+}
+
+function ingestCaptureFieldValue() {
+  if (!mobileKbInput) {
+    return;
+  }
+  const raw = mobileKbInput.value.replace(/[^a-zA-Z]/g, '').toLowerCase().slice(0, 5);
+  for (let i = 0; i < 5; i++) {
+    guessLetters[i] = raw[i] || '';
+  }
+  if (raw.length === 0) {
+    activeSlot = 1;
+  } else if (raw.length >= 5) {
+    activeSlot = 5;
+  } else {
+    activeSlot = raw.length + 1;
+  }
+  mobileKbInput.value = raw;
+  syncGuessToDOM();
+}
+
+function isOtherFormField(el) {
+  if (!el || el.id === 'mobile-keyboard-capture') {
+    return false;
+  }
+  const tag = el.tagName;
+  if (tag === 'TEXTAREA' || el.isContentEditable) {
+    return true;
+  }
+  if (tag === 'INPUT') {
+    return true;
+  }
+  return false;
+}
+
+function showToast(message) {
+  if (!toastEl) {
+    return;
+  }
+  clearTimeout(toastHideTimer);
+  toastEl.textContent = message;
+  toastEl.classList.add('toast--visible');
+  toastHideTimer = setTimeout(function () {
+    toastEl.classList.remove('toast--visible');
+  }, 2800);
+}
 
 function getWordOfTheDay() {
   const promise = fetch(wordURL);
@@ -62,6 +123,7 @@ function syncGuessToDOM() {
       el.innerText = ch ? ch.toUpperCase() : '';
     }
   }
+  syncCaptureFromGuessState();
   setFocusedSquare();
 }
 
@@ -107,7 +169,7 @@ function removeBorder(number) {
   }
 }
 
-document.addEventListener('keydown', function (event) {
+function handleGameKeydown(event) {
   if (dialogHelp.open) {
     return;
   }
@@ -118,6 +180,7 @@ document.addEventListener('keydown', function (event) {
     alreadyRunning === false &&
     column < 7
   ) {
+    event.preventDefault();
     alreadyRunning = true;
     verifyIfWordExists();
     return;
@@ -127,24 +190,26 @@ document.addEventListener('keydown', function (event) {
     return;
   }
 
-  const tag = event.target && event.target.tagName;
-  if (tag === 'INPUT' || tag === 'TEXTAREA' || event.target.isContentEditable) {
+  if (isOtherFormField(event.target)) {
     return;
   }
 
   if (event.key === 'ArrowLeft' && activeSlot > 1) {
+    event.preventDefault();
     activeSlot--;
-    setFocusedSquare();
+    syncGuessToDOM();
     return;
   }
 
   if (event.key === 'ArrowRight' && activeSlot < 5) {
+    event.preventDefault();
     activeSlot++;
-    setFocusedSquare();
+    syncGuessToDOM();
     return;
   }
 
   if (event.key === 'Backspace') {
+    event.preventDefault();
     if (guessLetters[activeSlot - 1]) {
       guessLetters[activeSlot - 1] = '';
     } else if (activeSlot > 1) {
@@ -156,14 +221,38 @@ document.addEventListener('keydown', function (event) {
   }
 
   if (isLetter(event.key)) {
+    event.preventDefault();
     guessLetters[activeSlot - 1] = event.key.toLowerCase();
-    syncGuessToDOM();
     if (activeSlot < 5) {
       activeSlot++;
     }
-    setFocusedSquare();
+    syncGuessToDOM();
   }
-});
+}
+
+document.addEventListener('keydown', handleGameKeydown);
+
+if (mobileKbInput) {
+  mobileKbInput.addEventListener('input', function () {
+    if (
+      ignoreCaptureInputEvent ||
+      !prefersTouchKeyboard() ||
+      dialogHelp.open ||
+      column >= 7 ||
+      alreadyRunning
+    ) {
+      return;
+    }
+    ingestCaptureFieldValue();
+  });
+}
+
+function focusMobileKeyboardIfNeeded() {
+  if (!mobileKbInput || !prefersTouchKeyboard()) {
+    return;
+  }
+  mobileKbInput.focus({ preventScroll: true });
+}
 
 document.querySelector('.square__container').addEventListener('click', function (e) {
   const cell = e.target.closest('.square');
@@ -176,7 +265,8 @@ document.querySelector('.square__container').addEventListener('click', function 
     return;
   }
   activeSlot = col;
-  setFocusedSquare();
+  syncGuessToDOM();
+  focusMobileKeyboardIfNeeded();
 });
 
 function verifyIfWordExists() {
@@ -197,14 +287,18 @@ function verifyIfWordExists() {
         verifyWord();
       } else {
         for (let i = 1; i < 6; i++) {
-          let squareElement = document.querySelector(`.square-${column}-${i}`);
+          const squareElement = document.querySelector(`.square-${column}-${i}`);
           squareElement.style.backgroundColor = 'red';
-          setTimeout(function () {
+        }
+        setTimeout(function () {
+          for (let i = 1; i < 6; i++) {
+            const squareElement = document.querySelector(`.square-${column}-${i}`);
             squareElement.style.backgroundColor = 'white';
-          }, 100);
+          }
           clear();
           alreadyRunning = false;
-        }
+          showToast('Esta palavra não é válida no jogo.');
+        }, 120);
       }
     });
 }
@@ -330,6 +424,9 @@ help.addEventListener('click', showHelp);
 closeDialog.addEventListener('click', closeHelp);
 
 function showHelp() {
+  if (mobileKbInput) {
+    mobileKbInput.blur();
+  }
   dialogHelp.showModal();
 }
 function closeHelp() {
